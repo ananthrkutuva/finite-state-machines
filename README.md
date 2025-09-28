@@ -4,7 +4,7 @@ CompRobo FA 2025 - Ananth Kutuva & Cian Linehan
 
 ## Introduction and Overview
 
-This project was mainly for us to get a feel for the various concepts of ROS2 and robot software development as a whole. We were able to implement 4 behaviors with a finite state machine as well. Our initial simple behaviors were teleop control and driving in a square. The more advanced behaviors we chose were collision avoidance and person following. We integrated teleop, collision avoidance, and person following in our finite state machine. 
+This project was mainly for us to get a feel for the various concepts of ROS2 and robot software development as a whole. We were able to implement 4 behaviors with a finite state machine as well. Our initial simple behaviors were teleop control and driving in a square. The advanced behavior we chose to implement was person following. We combined person following, driving in a square, and if bumped, spin in place in our finite state machine.
 
 ## Behaviors
 
@@ -24,7 +24,6 @@ This behavior creates a TeleOp Node which takes in input from the user in the fo
 #### Code Structure
 
 We implemented this behavior by polling for keyboard inputs in getKey() using sys, tty, termios, and select, taking in one keystroke at a time in a non-blocking fashion. Alongside, we had a method called direction() which took in the key entered and called our drive() method to command the robot to turn drive at 0.25 m/s or rad/s, or stop. Our Neato was subscribed to the cmd_vel topic and receive our messages. getKey() and direction() were both called 10 times per second in the run_loop() method by our timer and quickly reacted to key inputs, publishing a Twist message to the 'cmd_vel' topic through our velocity_publisher. 
-
 
 ### Drive in a Square
 

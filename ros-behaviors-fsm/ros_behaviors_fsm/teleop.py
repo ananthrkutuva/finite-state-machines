@@ -3,7 +3,6 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
-from threading import Event
 
 """Uses the following packages to take in keyboard input."""
 import tty
