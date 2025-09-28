@@ -56,9 +56,9 @@ class TeleOp(Node):
 
         tty.setraw(sys.stdin.fileno())
         select.select([sys.stdin], [], [], 0)
-        key_pressed = sys.stdin.read(1)
+        self.key_pressed = sys.stdin.read(1)
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
-        return key_pressed
+        return self.key_pressed
 
     def bump_pressed(self, msg):
         """
