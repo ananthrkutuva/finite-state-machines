@@ -15,9 +15,9 @@ This project was mainly for us to get a feel for the various concepts of ROS2 an
 This behavior creates a TeleOp Node which takes in input from the user in the form of their WASD keys and controls the movement of the robot.
 
 **W** : Drive Forward\
-**A** : Turn in Place to the Left\
+**A** : Rotate Counterclockwise\
 **S** : Drive Backward\
-**D** : Turn in Place to the Right\
+**D** : Rotate Clockwise\
 **Other Key** : Halt Movement (Brake)\
 **Ctrl + C** : E-stop
 
@@ -34,3 +34,12 @@ This behavior creates a DriveSquare Node which commands the robot to drive in a 
 #### Code Structure
 
 This behavior used a similar method as teleoperation, publishing a Twist message to the 'cmd_vel' topic. We initially created a drive_forward() and turn_left() method and ran these consecutively 8 times to trace out the square path twice. Implementing drive_forward(), we commanded the robot to drive at 0.1 m/s using our drive() method, telling the program to sleep for (side length / velocity), in our case 5 seconds. Implementing turn_left(), we ran the same calculation for a 90 degree turn. 90 degrees is equivalent to pi/2 radians, turning at 0.3 rad/sec, we told the program to sleep for (radians / angular velocity), coming out to approximately 5.23 seconds.
+
+### Person Following
+
+#### Overview
+
+This behavior creates a PersonFollowing Node which uses the laser scanning data to find the closes point cloud around the robot and drive toward it.
+
+#### Code Structure
+

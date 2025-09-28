@@ -15,7 +15,7 @@ from time import sleep
 
 class DriveSquare(Node):
     """
-    A class that implements a node to drive the in a square shape.
+    A class that implements a node to drive the robot in a square shape.
     """
 
     def __init__(self):
