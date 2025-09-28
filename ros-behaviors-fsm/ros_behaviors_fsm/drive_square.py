@@ -1,7 +1,7 @@
 """
 Drive Square
 ~~~~~~~~~~~~~~~~~~~~~~~
-Drive the robot on path along the edges of a square. 
+Drive the robot on path along the edges of a square.
 
 """
 
@@ -19,9 +19,10 @@ class DriveSquare(Node):
     """
     A class that implements a node to drive the in a square shape.
     """
+
     def __init__(self):
-        super().__init__('drive_square')
-        self.vel_pub = self.create_publisher(Twist, 'cmd_vel', 10)
+        super().__init__("drive_square")
+        self.vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
         self.run_loop_thread = Thread(target=self.run_loop)
         self.run_loop_thread.start()
 
@@ -33,10 +34,10 @@ class DriveSquare(Node):
         self.drive(0.0, 0.0)
         sleep(1)
 
-        for _ in range(8): # Drive the square path twice
+        for _ in range(8):  # Drive the square path twice
             self.drive_forward(0.5)
             self.turn_left()
-        print('Finished')
+        print("Finished")
 
     def drive(self, linear, angular):
         """
@@ -58,9 +59,9 @@ class DriveSquare(Node):
         Turn the robot left 90 degrees
         """
         angular_vel = 0.3
-        self.drive(0.0, angular_vel) # Start turning
+        self.drive(0.0, angular_vel)  # Start turning
         sleep(math.pi / angular_vel / 2)
-        self.drive(0.0,0.0) # Stop turning
+        self.drive(0.0, 0.0)  # Stop turning
 
     def drive_forward(self, dist):
         """
@@ -72,9 +73,10 @@ class DriveSquare(Node):
         """
 
         forward_vel = 0.1
-        self.drive(forward_vel, 0.0) # Start driving
-        sleep(dist / forward_vel) 
-        self.drive(0.0,0.0) # Stop driving
+        self.drive(forward_vel, 0.0)  # Start driving
+        sleep(dist / forward_vel)
+        self.drive(0.0, 0.0)  # Stop driving
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -83,5 +85,6 @@ def main(args=None):
     node.destroy_node()
     rclpy.shutdown()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

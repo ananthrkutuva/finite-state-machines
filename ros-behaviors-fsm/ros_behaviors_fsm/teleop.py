@@ -45,7 +45,7 @@ class TeleOp(Node):
         select.select([sys.stdin], [], [], 0)
         self.key_pressed = sys.stdin.read(1)
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
-        
+
     def direction(self):
         """
         Takes in a certain key input and commands the robot to drive in that direction.
