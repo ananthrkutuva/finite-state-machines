@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'ros-behaviors-fsm'
+package_name = 'ros_behaviors_fsm'
 
 setup(
     name=package_name,
@@ -24,8 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'teleop = ros-behaviors-fsm.teleop:main',
-            'drive_square = ros-behaviors-fsm.drive_square:main',
+            'teleop = ros_behaviors_fsm.teleop:main'
         ],
     },
 )

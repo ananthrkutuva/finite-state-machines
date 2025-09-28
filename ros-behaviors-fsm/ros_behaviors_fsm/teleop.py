@@ -35,14 +35,14 @@ class TeleOp(Node):
         self.settings = termios.tcgetattr(sys.stdin)
 
         """Creates a timer that runs every 0.1s"""
-        self.timer = self.create_timer(timer_period, self.run_loop)
+        self.timer = self.create_timer(self.timer_period, self.run_loop)
 
         """
         Create a subscriber to the bump sensor.
         Listens to the ROS networks and send messages over the "bump" topic name.
         """
         self.bump_subscriber = self.create_subscription(
-            Bump, "bump", self.process_bump, 10
+            Bump, "bump", self.bump_pressed, 10
         )
 
         """
@@ -51,13 +51,13 @@ class TeleOp(Node):
         """
         self.velocity_publisher = self.create_publisher(Twist, "cmd_vel", 10)
 
-    def getKey():
+    def getKey(self):
         """Uses raw input through terminal attributes to take in keyboard input and control the robot."""
 
         tty.setraw(sys.stdin.fileno())
         select.select([sys.stdin], [], [], 0)
         key_pressed = sys.stdin.read(1)
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
         return key_pressed
 
     def bump_pressed(self, msg):
@@ -91,19 +91,19 @@ class TeleOp(Node):
             Any Other Key - Halt Movement
         """
 
-        if self.key == "w":
+        if self.key_pressed == "w":
             self.drive(0.3, 0.0)
-        elif self.key == "a":
+        elif self.key_pressed == "a":
             self.drive(0.0, 0.3)
-        elif self.key == "s":
+        elif self.key_pressed == "s":
             self.drive(-0.3, 0.0)
-        elif self.key == "d":
+        elif self.key_pressed == "d":
             self.drive(0.0, -0.3)
-        elif self.key == "\x03":
+        elif self.key_pressed == "\x03":
             rclpy.shutdown()
         else:
             self.drive(0.0, 0.0)
-            self.key = None
+            self.key_pressed = None
             
     def drive(self, linear, angular):
         """
@@ -124,15 +124,15 @@ class TeleOp(Node):
 
         self.getKey()
         self.direction()
-        self.bump_pressed()
 
-    def main(args=None):
-        """Initializes the node, run it, and cleanup on shut down."""
+def main(args=None):
+    """Initializes the node, run it, and cleanup on shut down."""
 
-        rclpy.init(args=args)
-        node = TeleOp()
-        rclpy.spin(node)
-        rclpy.shutdown()
+    rclpy.init(args=args)
+    node = TeleOp()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()
