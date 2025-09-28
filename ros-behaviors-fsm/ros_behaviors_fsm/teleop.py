@@ -2,8 +2,8 @@
 
 import rclpy
 from rclpy.node import Node
-from neato2_interfaces.msg import Bump
 from geometry_msgs.msg import Twist
+from threading import Event
 
 """Uses the following packages to take in keyboard input."""
 import tty
@@ -18,8 +18,6 @@ class TeleOp(Node):
 
     Publishers Needed:
         - Twist cmd_vel message: Commands wheel velocity in the linear and angular directions
-    Subscribers Needed:
-        - Bump to take in bump messages: Listens for bump sensor data
     """
 
     def __init__(self):
@@ -27,23 +25,12 @@ class TeleOp(Node):
         super().__init__("teleop")
         self.timer_period = 0.1
 
-        # Stores if the robot has been bumped
-        self.bump_state = False
-
         # Stores the current key pressed
         self.key_pressed = None
         self.settings = termios.tcgetattr(sys.stdin)
 
         """Creates a timer that runs every 0.1s"""
         self.timer = self.create_timer(self.timer_period, self.run_loop)
-
-        """
-        Create a subscriber to the bump sensor.
-        Listens to the ROS networks and send messages over the "bump" topic name.
-        """
-        self.bump_subscriber = self.create_subscription(
-            Bump, "bump", self.bump_pressed, 10
-        )
 
         """
         Create a publisher for controlling the motors.
@@ -58,27 +45,7 @@ class TeleOp(Node):
         select.select([sys.stdin], [], [], 0)
         self.key_pressed = sys.stdin.read(1)
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
-        return self.key_pressed
-
-    def bump_pressed(self, msg):
-        """
-        Callback for handling a bump sensor input.
-
-        Args:
-            msg (Bump): A Bump type message from the subscriber.
-        """
-
-        # Hitting any bumper causes the robot to e-stop
-        self.bump_state = (
-            msg.left_front == 1
-            or msg.right_front == 1
-            or msg.left_side == 1
-            or msg.right_side == 1
-        )
-
-        if self.bump_state == True:
-            rclpy.shutdown()
-
+        
     def direction(self):
         """
         Takes in a certain key input and commands the robot to drive in that direction.
@@ -87,10 +54,13 @@ class TeleOp(Node):
             A - Left
             S - Backward
             D - Right
-            Crtl + C - E-Stop
-            Any Other Key - Halt Movement
+            Crtl + C x2 - E-Stop
+            Any Other Key - Halt Movement (Brake)
         """
 
+        if self.key_pressed == "\x03":
+            rclpy.shutdown()
+            return
         if self.key_pressed == "w":
             self.drive(0.3, 0.0)
         elif self.key_pressed == "a":
@@ -99,19 +69,17 @@ class TeleOp(Node):
             self.drive(-0.3, 0.0)
         elif self.key_pressed == "d":
             self.drive(0.0, -0.3)
-        elif self.key_pressed == "\x03":
-            rclpy.shutdown()
         else:
             self.drive(0.0, 0.0)
             self.key_pressed = None
-            
+
     def drive(self, linear, angular):
         """
         Drive with the inputted linear and angular velocity.
 
         Args:
-            linear (float64): the inputted linear velocity in m/s
-            angular (float64): the inputted angular velocity in radians/s
+            linear (float64): the inputted linear velocity
+            angular (float64): the inputted angular velocity
         """
 
         vel = Twist()
@@ -125,6 +93,7 @@ class TeleOp(Node):
         self.getKey()
         self.direction()
 
+
 def main(args=None):
     """Initializes the node, run it, and cleanup on shut down."""
 
@@ -133,6 +102,7 @@ def main(args=None):
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()
