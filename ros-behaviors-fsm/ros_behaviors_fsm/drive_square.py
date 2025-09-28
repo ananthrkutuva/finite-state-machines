@@ -1,7 +1,7 @@
 """
 Drive Square
 ~~~~~~~~~~~~~~~~~~~~~~~
-Drive neato on path along the edges of a square. 
+Drive the robot on path along the edges of a square. 
 
 """
 
@@ -17,7 +17,7 @@ from time import sleep
 
 class DriveSquare(Node):
     """
-    A class that implements a node to drive a Neato robot in a square pattern.
+    A class that implements a node to drive the in a square shape.
     """
     def __init__(self):
         super().__init__('drive_square')
@@ -33,14 +33,14 @@ class DriveSquare(Node):
         self.drive(0.0, 0.0)
         sleep(1)
 
-        for _ in range(8): #drive a square path twice
+        for _ in range(8): # Drive the square path twice
             self.drive_forward(0.5)
             self.turn_left()
         print('Finished')
 
     def drive(self, linear, angular):
         """
-        Drive Neato given linear and angular velocities
+        Drive the robot given linear and angular velocities.
 
         Args:
 
@@ -55,16 +55,16 @@ class DriveSquare(Node):
 
     def turn_left(self):
         """
-        Turn Neato left 90 degrees
+        Turn the robot left 90 degrees
         """
         angular_vel = 0.3
-        self.drive(0.0, angular_vel) #start turning
+        self.drive(0.0, angular_vel) # Start turning
         sleep(math.pi / angular_vel / 2)
-        self.drive(0.0,0.0) #stop turning
+        self.drive(0.0,0.0) # Stop turning
 
     def drive_forward(self, dist):
         """
-        Drive Neato straight for specificed distance
+        Drive the robot straight for a specified distance
 
         Args:
 
@@ -72,9 +72,9 @@ class DriveSquare(Node):
         """
 
         forward_vel = 0.1
-        self.drive(forward_vel, 0.0) # start driving
+        self.drive(forward_vel, 0.0) # Start driving
         sleep(dist / forward_vel) 
-        self.drive(0.0,0.0) # stop driving
+        self.drive(0.0,0.0) # Stop driving
 
 def main(args=None):
     rclpy.init(args=args)
@@ -85,10 +85,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
-
-
-
-    
-
-

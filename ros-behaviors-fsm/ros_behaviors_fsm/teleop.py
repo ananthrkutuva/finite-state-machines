@@ -62,13 +62,13 @@ class TeleOp(Node):
             rclpy.shutdown()
             return
         if self.key_pressed == "w":
-            self.drive(0.3, 0.0)
+            self.drive(0.25, 0.0)
         elif self.key_pressed == "a":
-            self.drive(0.0, 0.3)
+            self.drive(0.0, 0.25)
         elif self.key_pressed == "s":
-            self.drive(-0.3, 0.0)
+            self.drive(-0.25, 0.0)
         elif self.key_pressed == "d":
-            self.drive(0.0, -0.3)
+            self.drive(0.0, -0.25)
         else:
             self.drive(0.0, 0.0)
             self.key_pressed = None
