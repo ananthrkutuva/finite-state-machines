@@ -24,7 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'teleop = ros_behaviors_fsm.teleop:main'
+            'teleop = ros_behaviors_fsm.teleop:main',
+            'drive_square = ros_behaviors_fsm.drive_square:main',
         ],
     },
 )
