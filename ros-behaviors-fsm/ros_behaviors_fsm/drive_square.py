@@ -7,10 +7,8 @@ Drive the robot on path along the edges of a square.
 
 import rclpy
 from rclpy.node import Node
-from threading import Thread, Event
+from threading import Thread
 from geometry_msgs.msg import Twist
-from sensor_msgs.msg import LaserScan
-from std_msgs.msg import Bool
 import math
 from time import sleep
 
