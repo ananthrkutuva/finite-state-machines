@@ -38,7 +38,12 @@ class TeleOp(Node):
         self.velocity_publisher = self.create_publisher(Twist, "cmd_vel", 10)
 
     def getKey(self):
-        """Uses raw input through terminal attributes to take in keyboard input and control the robot."""
+        """
+        Uses raw input through terminal attributes to take in keyboard input and control the robot.
+        
+        Returns:
+            None
+        """
 
         tty.setraw(sys.stdin.fileno())
         select.select([sys.stdin], [], [], 0)
@@ -55,6 +60,9 @@ class TeleOp(Node):
             D - Right
             Crtl + C x2 - E-Stop
             Any Other Key - Halt Movement (Brake)
+
+        Returns:
+            None
         """
 
         if self.key_pressed == "\x03":
@@ -79,6 +87,9 @@ class TeleOp(Node):
         Args:
             linear (float64): the inputted linear velocity
             angular (float64): the inputted angular velocity
+
+        Returns:
+            None
         """
 
         vel = Twist()

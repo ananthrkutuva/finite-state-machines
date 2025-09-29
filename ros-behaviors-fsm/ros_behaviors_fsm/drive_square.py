@@ -16,9 +16,12 @@ from time import sleep
 class DriveSquare(Node):
     """
     A class that implements a node to drive the robot in a square shape.
+    
+    Publishers Needed:
+        - Twist cmd_vel message: Commands wheel velocity in the linear and angular directions
     """
-
     def __init__(self):
+        """Initializes the TeleOp Node with no inputs."""
         super().__init__("drive_square")
         self.vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
         self.run_loop_thread = Thread(target=self.run_loop)
@@ -42,9 +45,8 @@ class DriveSquare(Node):
         Drive the robot given linear and angular velocities.
 
         Args:
-
-        linear (float64): the linear velocity in m/s
-        angular (float64): the angular velocity in rad/s
+            linear (float64): the linear velocity in m/s
+            angular (float64): the angular velocity in rad/s
         """
 
         msg = Twist()
@@ -54,7 +56,7 @@ class DriveSquare(Node):
 
     def turn_left(self):
         """
-        Turn the robot left 90 degrees
+        Turn the robot left 90 degrees by calling drive()
         """
         angular_vel = 0.3
         self.drive(0.0, angular_vel)  # Start turning
@@ -66,8 +68,7 @@ class DriveSquare(Node):
         Drive the robot straight for a specified distance
 
         Args:
-
-        dist (float64): distance to drive forward (only positive)
+            dist (float64): distance to drive forward (only positive)
         """
 
         forward_vel = 0.1
