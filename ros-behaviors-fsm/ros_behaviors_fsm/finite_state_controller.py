@@ -51,6 +51,9 @@ class FSMControllerNode(Node):
     def get_item_error(self, msg: LaserScan):
         """
         Handles laserscans from the subscriber
+
+        Args:
+            msg (LaserScan): The incoming LiDAR scan message.
         """
 
         #initalize variables
@@ -89,6 +92,9 @@ class FSMControllerNode(Node):
     def handle_bump(self, msg: Bump):
         """
         handles bump sensor
+
+        Args:
+            msg (Bump): The incoming bump sensor message.
         """
         # check to see if bumped
         self.bumped = (msg.left_front or msg.right_front or msg.left_side or msg.right_side)
