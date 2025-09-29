@@ -4,7 +4,7 @@ CompRobo FA 2025 - Ananth Kutuva & Cian Linehan
 
 ## Introduction and Overview
 
-This project was mainly for us to get a feel for the various concepts of ROS2 and robot software development as a whole. We were able to implement 4 behaviors with a finite state machine as well. Our initial simple behaviors were teleop control and driving in a square. The advanced behavior we chose to implement was person following. We combined driving in a square and person following, where the Neato drives in a square continuously, and if bumped, follow a person.
+This project was mainly for us to get a feel for the various concepts of ROS2 and robot software development as a whole. We were able to implement 3 behaviors with a finite state machine as well. Our initial simple behaviors were teleop control and driving in a square. The advanced behavior we chose to implement was person following. We combined driving in a square and person following, where the Neato drives in a square continuously, and if bumped, follow a person.
 
 ## Behaviors
 
@@ -12,7 +12,7 @@ This project was mainly for us to get a feel for the various concepts of ROS2 an
 
 #### Overview
 
-This behavior creates a TeleOp Node which takes in input from the user in the form of their WASD keys and controls the movement of the Neato.
+This behavior creates a TeleOp Node which takes in input from the user in the form of their WASD keys and controls the movement of the Neato. This behavior dealt with non-blocking code and fundamentally controlling the Neato.
 
 **W** : Drive Forward\
 **A** : Rotate Counterclockwise\
@@ -23,23 +23,26 @@ This behavior creates a TeleOp Node which takes in input from the user in the fo
 
 #### Code Structure
 
-We implemented this behavior by polling for keyboard inputs in getKey() using sys, tty, termios, and select, taking in one keystroke at a time in a non-blocking fashion. Alongside, we had a method called direction() which took in the key entered and called our drive() method to command the Neato to turn drive at 0.25 m/s or rad/s, or stop. Our Neato was subscribed to the cmd_vel topic and receive our messages. getKey() and direction() were both called 10 times per second in the run_loop() method by our timer and quickly reacted to key inputs, publishing a Twist message to the ```/cmd_vel``` topic through our velocity_publisher. 
+The overall structure is a single class, TeleOp, which inherits from the base Node class. We implemented this behavior by polling for keyboard inputs in getKey() using sys, tty, termios, and select, taking in one keystroke at a time in a non-blocking fashion. Alongside, we had a method called direction() which took in the key entered and called our drive() method to command the Neato to turn drive at 0.25 m/s or rad/s, or stop. Our Neato was subscribed to the cmd_vel topic and receive our messages. getKey() and direction() were both called 10 times per second in the run_loop() method by our timer and quickly reacted to key inputs, publishing a Twist message to the ```/cmd_vel``` topic through our velocity_publisher.
 
 ### Drive in a Square
 
 #### Overview
 
-This behavior creates a DriveSquare Node which commands the Neato to drive in a square path two times.
+This behavior creates a DriveSquare Node which commands the Neato to drive in a square path two times. This behavior implemented a finite loop and math to calculate distance traveled as well as angle turned.
 
 #### Code Structure
 
-This behavior used a similar method as teleoperation, publishing a Twist message to the ```/cmd_vel``` topic. We initially created a drive_forward() and turn_left() method and ran these consecutively 8 times to trace out the square path twice. Implementing drive_forward(), we commanded the Neato to drive at 0.1 m/s using our drive() method, telling the program to sleep for (side length / velocity), in our case 5 seconds. Implementing turn_left(), we ran the same calculation for a 90 degree turn. 90 degrees is equivalent to pi/2 radians, turning at 0.3 rad/sec, we told the program to sleep for (radians / angular velocity), coming out to approximately 5.23 seconds.
+The single class, similar to teleoperation, called DriveSquare allows us to initialize all needed publishers and movement methods in one place. This behavior used a similar method as teleoperation, publishing a Twist message to the ```/cmd_vel``` topic. We initially created a drive_forward() and turn_left() method and ran these consecutively 8 times to trace out the square path twice. Implementing drive_forward(), we commanded the Neato to drive at 0.1 m/s using our drive() method, telling the program to sleep for (side length / velocity), in our case 5 seconds. Implementing turn_left(), we ran the same calculation for a 90 degree turn. 90 degrees is equivalent to pi/2 radians, turning at 0.3 rad/sec, we told the program to sleep for (radians / angular velocity), coming out to approximately 5.23 seconds.
 
 ### Person Following
 
 #### Overview
 
 This behavior creates a PersonFollowing Node which uses the laser scanning data to find the closes point cloud around the Neato and drive toward it.
+
+[Real Life Example](https://youtube.com/shorts/5FZWkgwF-qI?feature=share)\
+[Rviz2 Example](https://youtu.be/bC2WSW05K24)
 
 #### Code Structure
 
@@ -56,7 +59,10 @@ This behavior was much more involved compared to the other two as we needed to t
 
 As the run_loop executes 10 times per second, the needed_angle value is constantly recalculated, stepping up or down the commanded angular velocity until the Neato is directly facing the cluster of points (the object).
 
-#### Finite State Machine
+### Finite State Machine
+
+#### Driving in a Square + Person Following + Bump Sensing
+
 The main purpose of this assignment is to create a finite state machine, which combines the drive square node and the person follower node with a bump sensor state-switch. The Neato will drive in a square until the bumper is pressed. From there, it will person follow until the bumper is pressed again, where it will switch back to driving in a square.
 
 <img width="1444" height="718" alt="Screenshot from 2025-09-29 00-44-20" src="https://github.com/user-attachments/assets/8dd19a70-7f16-4b49-b90d-91e20fa0319e" />
@@ -82,6 +88,10 @@ Square Functions: The sleep() implementation used in our drive_square.py code do
 
 Person Following Functions: A reimplementation of the person follower behavior, with the added job of subscribing to the /bump topic and switching the state of the finite state machine from person following to square when the bump sensors are pressed.
 
+### Challenges Faced
 
-### Driving in a Square + Person Following + Bump Sensing
 
+### Improvements for the Future
+
+
+### Key Takeaways
