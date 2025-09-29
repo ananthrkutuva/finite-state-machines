@@ -57,6 +57,7 @@ This behavior was much more involved compared to the other two as we needed to t
 As the run_loop executes 10 times per second, the needed_angle value is constantly recalculated, stepping up or down the commanded angular velocity until the Neato is directly facing the cluster of points (the object).
 
 ## Finite State Machine
+<img width="1444" height="718" alt="Screenshot from 2025-09-29 00-44-20" src="https://github.com/user-attachments/assets/8dd19a70-7f16-4b49-b90d-91e20fa0319e" />
 
 ### Driving in a Square + Person Following + Bump Sensing
 
