@@ -60,6 +60,9 @@ class PersonFollowing(Node):
         # Creates a corresponding angle array to plot the data against
         self.angles = np.array(range(361))
 
+        # Value to convert angles in degrees to radians
+        degree_conversion = np.pi / 180
+
         # Creating helper array to remove values out of our bounds, helper assigns True to values that are in our range
         helper = (self.scanned_points > self.MINIMUM_SCAN_DISTANCE) & (
             self.scanned_points < self.MAXIMUM_SCAN_DISTANCE
@@ -68,6 +71,13 @@ class PersonFollowing(Node):
         # scanned_points and angles (now smaller) only contain values that are in our range
         self.scanned_points = self.scanned_points[helper]
         self.angles = self.angles[helper]
+
+        # Converting our polar coordinates to cartesian coordinates
+        self.x_coordinates = np.multiply(self.scanned_points, np.cos(np.multiply(self.angles, degree_conversion)))
+        self.y_coordinates = np.multiply(self.scanned_points, np.sin(np.multiply(self.angles, degree_conversion)))
+
+        # Finds the center of mass of the object by taking the average position of all the x and y coordinates
+        self.average_x_pos = np.average()
 
     def drive(self, linear, angular):
         """
