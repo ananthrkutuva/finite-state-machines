@@ -25,8 +25,8 @@ setup(
         "console_scripts": [
             "teleop = ros_behaviors_fsm.teleop:main",
             "drive_square = ros_behaviors_fsm.drive_square:main",
-            "person_following = ros_behaviors_fsm.person_following:main", 
-            "finite_state_controller = ros_behaviors_fsm.finite_state_controller:main"
+            "person_following = ros_behaviors_fsm.person_following:main",
+            "finite_state_controller = ros_behaviors_fsm.finite_state_controller:main",
         ],
     },
 )
