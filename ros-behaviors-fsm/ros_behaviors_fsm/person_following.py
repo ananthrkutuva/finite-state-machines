@@ -2,11 +2,8 @@
 
 import rclpy
 from rclpy.node import Node
-from threading import Thread
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
-import math
-from time import sleep
 import numpy as np
 
 
@@ -87,20 +84,20 @@ class PersonFollowing(Node):
         if len(self.scanned_points) > 0:
 
             # Converting our polar coordinates to cartesian coordinates
-            self.x_coordinates = np.multiply(self.scanned_points, np.cos(np.multiply(self.angles, degree_conversion)))
-            self.y_coordinates = np.multiply(self.scanned_points, np.sin(np.multiply(self.angles, degree_conversion)))
+            self.x_coords = np.multiply(self.scanned_points, np.cos(np.multiply(self.angles, degree_conversion)))
+            self.y_coords = np.multiply(self.scanned_points, np.sin(np.multiply(self.angles, degree_conversion)))
 
             # Finds the center of mass of the object by taking the average position of all the x and y coordinates
-            self.average_x_pos = np.average(self.x_coordinates)
-            self.average_y_pos = np.average(self.y_coordinates)
+            self.avg_x_pos = np.average(self.x_coords)
+            self.avg_y_pos = np.average(self.y_coords)
 
             # Using the given object position, calculates the distance and angle of it from the robot
-            self.object_distance = np.sqrt(self.average_x_pos**2 + self.average_y_pos**2)
-            self.angle = np.arctan2(self.average_y_pos, self.average_x_pos)
+            self.obj_dist = np.sqrt(self.avg_x_pos**2 + self.avg_y_pos**2)
+            self.angle = np.arctan2(self.avg_y_pos, self.avg_x_pos)
 
             self.needed_angle = self.angle
         else:
-            self.object_distance = 100
+            self.obj_dist = 100
             self.needed_angle = 0.0
 
 
