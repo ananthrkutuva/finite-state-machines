@@ -8,7 +8,7 @@ This project was mainly for us to get a feel for the various concepts of ROS2 an
 
 ## Behaviors
 
-### Teleoperation
+### 1. Teleoperation
 
 #### Overview
 
@@ -25,7 +25,7 @@ This behavior creates a TeleOp Node which takes in input from the user in the fo
 
 The overall structure is a single class, TeleOp, which inherits from the base Node class. We implemented this behavior by polling for keyboard inputs in getKey() using sys, tty, termios, and select, taking in one keystroke at a time in a non-blocking fashion. Alongside, we had a method called direction() which took in the key entered and called our drive() method to command the Neato to turn drive at 0.25 m/s or rad/s, or stop. Our Neato was subscribed to the cmd_vel topic and receive our messages. getKey() and direction() were both called 10 times per second in the run_loop() method by our timer and quickly reacted to key inputs, publishing a Twist message to the ```/cmd_vel``` topic through our velocity_publisher.
 
-### Drive in a Square
+### 2. Drive in a Square
 
 #### Overview
 
@@ -35,7 +35,7 @@ This behavior creates a DriveSquare Node which commands the Neato to drive in a 
 
 The single class, similar to teleoperation, called DriveSquare allows us to initialize all needed publishers and movement methods in one place. This behavior used a similar method as teleoperation, publishing a Twist message to the ```/cmd_vel``` topic. We initially created a drive_forward() and turn_left() method and ran these consecutively 8 times to trace out the square path twice. Implementing drive_forward(), we commanded the Neato to drive at 0.1 m/s using our drive() method, telling the program to sleep for (side length / velocity), in our case 5 seconds. Implementing turn_left(), we ran the same calculation for a 90 degree turn. 90 degrees is equivalent to pi/2 radians, turning at 0.3 rad/sec, we told the program to sleep for (radians / angular velocity), coming out to approximately 5.23 seconds.
 
-### Person Following
+### 3. Person Following
 
 #### Overview
 
@@ -59,7 +59,11 @@ This behavior was much more involved compared to the other two as we needed to t
 
 As the run_loop executes 10 times per second, the needed_angle value is constantly recalculated, stepping up or down the commanded angular velocity until the Neato is directly facing the cluster of points (the object).
 
-### Finite State Machine
+![IMG_9259](https://github.com/user-attachments/assets/32fcfa48-c974-4614-870f-bc77649c5a8b)
+
+#### Figure 1. A Diagram of Our Point Thresholds, Point Cluster, and Angle Requirement
+
+### 4. Finite State Machine
 
 #### Driving in a Square + Person Following + Bump Sensing
 
@@ -67,20 +71,19 @@ The main purpose of this assignment is to create a finite state machine, which c
 
 <img width="1444" height="718" alt="Screenshot from 2025-09-29 00-44-20" src="https://github.com/user-attachments/assets/8dd19a70-7f16-4b49-b90d-91e20fa0319e" />
 
-#### Figure 1. The RQT graph of our Finite State Machine
+#### Figure 2. The RQT graph of our Finite State Machine
 
 The above graph is a bit complicated and difficult to understand. As such, here is a simpler graph that captures the jist of the nodes and topics which make our finite state machine work:
 
 ![nodes_topics](https://github.com/user-attachments/assets/5f165d82-1edc-4ead-81b5-cc60394d3863)
 
-#### Figure 2. Simpler Node/Topic graph of our Finite State Machine
+#### Figure 3. Simpler Node/Topic graph of our Finite State Machine
 
 ### Code Structure
 
 There are two states are run within our FSM node, driving in a square, and person following. The state starts driving in a square and is switched whenever the bumper is pressed. 
 
 ![states](https://github.com/user-attachments/assets/31206daa-2131-4595-9e53-99af71b7ee04)
-
 
 Finite State Machine Functions: The finite state machine is in charge of keeping track of the current active state (square or person following) and running the appropriate functions for the Neato to perform that behavior.
 
@@ -90,8 +93,12 @@ Person Following Functions: A reimplementation of the person follower behavior, 
 
 ### Challenges Faced
 
+We faced several hurdles before starting this project while we were setting up our computers. The process of dual booting was very finicky and set us back the most during this project. Throughout the actual project, we faced a steep learning curve while getting a feel for the vocabulary used in ROS2 such as nodes, subscribers, publishers, topics, and messages. We were confused about where to begin with the project as we weren't able to get a full grasp of the in-class activites such as teleop or driving in a square before diving into the project. Once we got up to speed with the basic structure and understood how the various parts of our python files worked, we felt more comfortable tackling the advanced behaviors and finite state machine.
 
 ### Improvements for the Future
 
+If we had more time with this project, we would definitely have tried to optimize some of our scripts. For example, one bug that we weren't able to fix was that clicking Ctrl+C in our teleop code would need to be pressed twice before the script would exit. We weren't sure if this was because our key input method was truly non-blocking or if something else was causing this. We also originally attempted to include a bumper e-stop element in our teleop code but continously ran into an issue where the e-stop would only trigger after a key was pressed after the Neato ran into something, not immediately once it hit an object. We would like to expand our knowledge of PID as well as we were only able to experiment with proportional angular velocity control in our person follower. We want to explore using ROS parameters, threading, or more complex methods of control.
 
 ### Key Takeaways
+
+Some of our biggest takeaways included all the new concepts we have learned through this warmup project: setting up Nodes, publishing messages to topics, receiving sensor inputs through subscribers, logic control in each state are all super useful for our next projects.
