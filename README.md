@@ -52,12 +52,36 @@ Our control code can be split up into 6 steps:
 5. Calculate the distance and angle from the Neato to the cluster
 6. Turn and drive toward the cluster by publishing to ```/cmd_vel```
 
-This behavior was much more involved compared to the other two as we needed to take information from the laser scan of the Neato and use that data to inform the Neato's movements. By subscribing to LaserScan messages on the ```/scan``` topic, we can use an array of points organized by degree values around the Neato to find a grouping of points that are within a certain radius of the Neato. We can then convert these points from polar coordinates (radius, theta) to cartesian (X, Y) coordinates to calculate the location of this cluster compared to the Neato. We use Pythagorean Theorem to calculate the distance from the Neato to the cluster as well as the angle between the object and the heading of the Neato. Using this needed_angle value, we can command the Neato to turn, with larger angles commanding a faster angular velocity.\
+This behavior was much more involved compared to the other two as we needed to take information from the laser scan of the Neato and use that data to inform the Neato's movements. By subscribing to LaserScan messages on the ```/scan``` topic, we can use an array of points organized by degree values around the Neato to find a grouping of points that are within a certain radius of the Neato. We can then convert these points from polar coordinates (radius, theta) to cartesian (X, Y) coordinates to calculate the location of this cluster compared to the Neato. We use Pythagorean Theorem to calculate the distance from the Neato to the cluster as well as the angle between the object and the heading of the Neato. Using this needed_angle value, we can command the Neato to turn, with larger angles commanding a faster angular velocity.
 
 As the run_loop executes 10 times per second, the needed_angle value is constantly recalculated, stepping up or down the commanded angular velocity until the Neato is directly facing the cluster of points (the object).
 
-## Finite State Machine
+#### Finite State Machine
+The main purpose of this assignment is to create a finite state machine, which combines the drive square node and the person follower node with a bump sensor state-switch. The Neato will drive in a square until the bumper is pressed. From there, it will person follow until the bumper is pressed again, where it will switch back to driving in a square.
+
 <img width="1444" height="718" alt="Screenshot from 2025-09-29 00-44-20" src="https://github.com/user-attachments/assets/8dd19a70-7f16-4b49-b90d-91e20fa0319e" />
+
+#### Figure 1. The RQT graph of our Finite State Machine
+
+The above graph is a bit complicated and difficult to understand. As such, here is a simpler graph that captures the jist of the nodes and topics which make our finite state machine work:
+
+![nodes_topics](https://github.com/user-attachments/assets/5f165d82-1edc-4ead-81b5-cc60394d3863)
+
+#### Figure 2. Simpler Node/Topic graph of our Finite State Machine
+
+### Code Structure
+
+There are two states are run within our FSM node, driving in a square, and person following. The state starts driving in a square and is switched whenever the bumper is pressed. 
+
+![states](https://github.com/user-attachments/assets/31206daa-2131-4595-9e53-99af71b7ee04)
+
+
+Finite State Machine Functions: The finite state machine is in charge of keeping track of the current active state (square or person following) and running the appropriate functions for the Neato to perform that behavior.
+
+Square Functions: The sleep() implementation used in our drive_square.py code does not work for a finite state machine as during sleep, the neato doesn't recognize when the bumper is pressed. Instead, we simply coded the functionality of the square directly inside the run_loop() function. When in the "square" state, linear and angular velocity values are published so that the Neato drives in a square. While it does this, it also listens for the bumper to be pressed on the Neato. If they do, the state switches to person following and the Neato begins following a person, until the bumper is pressed again, and the state switches back to "square".
+
+Person Following Functions: A reimplementation of the person follower behavior, with the added job of subscribing to the /bump topic and switching the state of the finite state machine from person following to square when the bump sensors are pressed.
+
 
 ### Driving in a Square + Person Following + Bump Sensing
 
