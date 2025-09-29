@@ -21,7 +21,7 @@ class PersonFollowing(Node):
 
     # Constants used for laser scanning
     MINIMUM_SCAN_DISTANCE = 0.1
-    MAXIMUM_SCAN_DISTANCE = 2.0
+    MAXIMUM_SCAN_DISTANCE = 1.5
 
     def __init__(self):
         """Initializing the PersonFollowing Node with no inputs."""
@@ -41,9 +41,7 @@ class PersonFollowing(Node):
         self.scan_sub = self.create_subscription(
             LaserScan, "scan", self.process_scan, 10
         )
-        self.visual_pub = self.create_publisher(
-            Marker, "visualization_marker", self.create_marker, 10
-        )
+        self.visual_pub = self.create_publisher(Marker, '/visualization_marker', 10)
 
     def run_loop(self):
         """The main loop for checking the error between the angle of the closest object and the robot, turning toward it, and driving toward it."""
@@ -101,6 +99,9 @@ class PersonFollowing(Node):
             self.avg_x_pos = np.average(self.x_coords)
             self.avg_y_pos = np.average(self.y_coords)
 
+            # Creates the marker for RViz
+            self.create_marker()
+
             # Using the given object position, calculates the distance and angle of it from the robot
             self.obj_dist = np.sqrt(self.avg_x_pos**2 + self.avg_y_pos**2)
             self.angle = np.arctan2(self.avg_y_pos, self.avg_x_pos)
@@ -146,7 +147,7 @@ class PersonFollowing(Node):
         marker.color.a = 1.0
         marker.color.g = 1.0
 
-        self.visualizer_publisher.publish(marker)
+        self.visual_pub.publish(marker)
 
 
 def main(args=None):
