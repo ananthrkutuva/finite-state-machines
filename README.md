@@ -6,6 +6,16 @@ CompRobo FA 2025 - Ananth Kutuva & Cian Linehan
 
 This project was mainly for us to get a feel for the various concepts of ROS2 and robot software development as a whole. We were able to implement 3 behaviors with a finite state machine as well. Our initial simple behaviors were teleop control and driving in a square. The advanced behavior we chose to implement was person following. We combined driving in a square and person following, where the Neato drives in a square continuously, and if bumped, follow a person.
 
+## How to Run
+
+Open a terminal and ensure you are in a ROS2 workspace. Build the package, and source the environment:
+```
+cd ~/ros2_ws
+colcon build --symlink-install --packages-select ros-behaviors-fsm
+source ~/ros2_ws/install/setup.bash
+```
+Then you can use ```ros2 run ros-behaviors-fsm "insert file name here"``` to run our 4 behaviors:
+
 ## Behaviors
 
 ### 1. Teleoperation
@@ -39,7 +49,7 @@ The single class, similar to teleoperation, called DriveSquare allows us to init
 
 #### Overview
 
-This behavior creates a PersonFollowing Node which uses the laser scanning data to find the closes point cloud around the Neato and drive toward it.
+This behavior creates a PersonFollowing Node which uses the laser scanning data to find the closest point cloud around the Neato and drive toward it.
 
 [Real Life Example](https://youtube.com/shorts/5FZWkgwF-qI?feature=share)\
 [Rviz2 Example](https://youtu.be/bC2WSW05K24)
@@ -63,7 +73,7 @@ As the run_loop executes 10 times per second, the needed_angle value is constant
 
 #### Figure 1. A Diagram of Our Point Thresholds, Point Cluster, and Angle Requirement
 
-### 4. Finite State Machine
+## Finite State Machine
 
 #### Driving in a Square + Person Following + Bump Sensing
 
@@ -85,6 +95,9 @@ There are two states are run within our FSM node, driving in a square, and perso
 
 ![states](https://github.com/user-attachments/assets/31206daa-2131-4595-9e53-99af71b7ee04)
 
+
+#### Figure 4. State Transition Diagram
+
 Finite State Machine Functions: The finite state machine is in charge of keeping track of the current active state (square or person following) and running the appropriate functions for the Neato to perform that behavior.
 
 Square Functions: The sleep() implementation used in our drive_square.py code does not work for a finite state machine as during sleep, the neato doesn't recognize when the bumper is pressed. Instead, we simply coded the functionality of the square directly inside the run_loop() function. When in the "square" state, linear and angular velocity values are published so that the Neato drives in a square. While it does this, it also listens for the bumper to be pressed on the Neato. If they do, the state switches to person following and the Neato begins following a person, until the bumper is pressed again, and the state switches back to "square".
@@ -92,13 +105,46 @@ Square Functions: The sleep() implementation used in our drive_square.py code do
 Person Following Functions: A reimplementation of the person follower behavior, with the added job of subscribing to the /bump topic and switching the state of the finite state machine from person following to square when the bump sensors are pressed.
 
 ### Challenges Faced
+Ananth:
 
 We faced several hurdles before starting this project while we were setting up our computers. The process of dual booting was very finicky and set us back the most during this project. Throughout the actual project, we faced a steep learning curve while getting a feel for the vocabulary used in ROS2 such as nodes, subscribers, publishers, topics, and messages. We were confused about where to begin with the project as we weren't able to get a full grasp of the in-class activites such as teleop or driving in a square before diving into the project. Once we got up to speed with the basic structure and understood how the various parts of our python files worked, we felt more comfortable tackling the advanced behaviors and finite state machine.
 
+Cian:
+
+Computational setups can cause the most challenges sometimes. Our #1 challenge was the computational setup. For most of the designated project time, both of our team members was experiencing many issues related to computational setup. As a result, we couldn't start the project until much later, shortening the amount of tiume we had to work on it.
+
+Working with sleep(). Our drive_square.py code uses sleep() in order to drive the path of the square. However, when it came time to implement the drive_square into our finite state machine, we couldn't read bump sensor inputs from the neato while the Neato was driving in a square. As a result we had to effectively redo drive_square inside our finite state machine controller code to avoid using sleep(). The lesson learned from this is that, especially in systems that are taking constant readings from the environment, we should avoid the use of sleep() in our code.
+
 ### Improvements for the Future
+Ananth:
 
 If we had more time with this project, we would definitely have tried to optimize some of our scripts. For example, one bug that we weren't able to fix was that clicking Ctrl+C in our teleop code would need to be pressed twice before the script would exit. We weren't sure if this was because our key input method was truly non-blocking or if something else was causing this. We also originally attempted to include a bumper e-stop element in our teleop code but continously ran into an issue where the e-stop would only trigger after a key was pressed after the Neato ran into something, not immediately once it hit an object. We would like to expand our knowledge of PID as well as we were only able to experiment with proportional angular velocity control in our person follower. We want to explore using ROS parameters, threading, or more complex methods of control.
 
+Cian:
+One of the things that intrigued me when working on the person follower is experimenting with weighting closers lidar scans more heavily in the choice of direction. As the Neato person follows, it averages all the valid points, giving them equal weight. This became a small issue when near chairs and tables as the Neato would occasionally turn toward the chairs/tables instead of following the person. A potential fix for this is to weight closer measured points more heavily than further ones. This would ensure the Neato is following the person it is closest to and not get too distracted by objects in the distance.
+
+Another interesting thing to do is if we did person following with obstacle avoidance/wall following so that the neato could maybe try follow a person through an imaginary labyrinth. This would pose an interesting challenge as rather than just driving toward the person, it would have to find the best way to get closer to the person. 
+
 ### Key Takeaways
 
+In the future, I think a safe move would be to never use sleep(). Assignments will only get more complex and likely need constant sensor input that is lost when using sleep().
+
+In terms of scoping, make account for when you need to do a computational setup and reserve plenty of time if you do. We should be fine for the coming projects, but for future work/classes.
+
+Use print statements and topic echo for debugging. Being able to see what is actually going on in your code is good for debugging.
+
+Even if you "divide and conquer" the work, make sure all team members understand as you go. Understanding when/as it is made can save much confusion and time later on.
+
+Use what you're given. There is so much useful and necessary things on the CompRobo website and in the day activities. Scan through those for something relevant to your problem can be helpful. Also talk to your classmates. Many people encounter the same problem and talking can be helpful.
+
 Some of our biggest takeaways included all the new concepts we have learned through this warmup project: setting up Nodes, publishing messages to topics, receiving sensor inputs through subscribers, logic control in each state are all super useful for our next projects.
+
+## Team Member Contributions
+
+#### Ananth
+Implemented teleop driving and person following. Recorded ROS bags. Used RVIZ to visualize person following behavior. Simulation and Real Life Neato testing. Worked on write up.
+
+#### Cian
+Implemented square driving and finite state machine controller. Simulation and Real Life Neato testing. Worked on writeup.
+
+
