@@ -22,15 +22,22 @@ class PersonFollowing(Node):
     """
 
     # Constants used for laser scanning
-    MINIMUM_SCAN_DISTANCE = 0.01
-    MAXIMUM_SCAN_DISTANCE = 4.0
+    MINIMUM_SCAN_DISTANCE = 0.1
+    MAXIMUM_SCAN_DISTANCE = 2.0
 
     def __init__(self):
-        """"""
+        """Initializing the PersonFollowing Node with no inputs."""
         super().__init__("person_following")
+
+        # Setting up all the variables to be used
         self.timer_period = 0.1
         self.scanned_points = None
         self.angles = None
+        self.needed_angle = 0.0
+        self.average_x_pos = 0.0
+        self.average_y_pos = 0.0
+        self.object_distance = 0.0
+
         self.timer = self.create_timer(self.timer_period, self.run_loop)
         self.vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
         self.scan_sub = self.create_subscription(
@@ -38,9 +45,13 @@ class PersonFollowing(Node):
         )
 
     def run_loop(self):
-        """The main loop for checking what is near the robot and driving toward it."""
-        print(self.scanned_points)
-        print(self.angles)
+        """The main loop for checking the error between the angle of the closest object and the robot, turning toward it, and driving toward it."""
+        if self.needed_angle > 0.5:
+            self.linear_velocity = 0.0
+        else:
+            self.linear_velocity = 0.2
+        self.angular_velocity = 0.75 * self.needed_angle
+        self.drive(self.linear_velocity, self.angular_velocity)
 
     def process_scan(self, msg: LaserScan):
         """
@@ -71,13 +82,27 @@ class PersonFollowing(Node):
         # scanned_points and angles (now smaller) only contain values that are in our range
         self.scanned_points = self.scanned_points[helper]
         self.angles = self.angles[helper]
+        
+        # Runs the distance and angle calculation if there is a cluster of points in the threshold area (ty charlie)
+        if len(self.scanned_points) > 0:
 
-        # Converting our polar coordinates to cartesian coordinates
-        self.x_coordinates = np.multiply(self.scanned_points, np.cos(np.multiply(self.angles, degree_conversion)))
-        self.y_coordinates = np.multiply(self.scanned_points, np.sin(np.multiply(self.angles, degree_conversion)))
+            # Converting our polar coordinates to cartesian coordinates
+            self.x_coordinates = np.multiply(self.scanned_points, np.cos(np.multiply(self.angles, degree_conversion)))
+            self.y_coordinates = np.multiply(self.scanned_points, np.sin(np.multiply(self.angles, degree_conversion)))
 
-        # Finds the center of mass of the object by taking the average position of all the x and y coordinates
-        self.average_x_pos = np.average()
+            # Finds the center of mass of the object by taking the average position of all the x and y coordinates
+            self.average_x_pos = np.average(self.x_coordinates)
+            self.average_y_pos = np.average(self.y_coordinates)
+
+            # Using the given object position, calculates the distance and angle of it from the robot
+            self.object_distance = np.sqrt(self.average_x_pos**2 + self.average_y_pos**2)
+            self.angle = np.arctan2(self.average_y_pos, self.average_x_pos)
+
+            self.needed_angle = self.angle
+        else:
+            self.object_distance = 100
+            self.needed_angle = 0.0
+
 
     def drive(self, linear, angular):
         """
