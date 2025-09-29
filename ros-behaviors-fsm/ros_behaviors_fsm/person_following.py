@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
+from visualization_msgs.msg import Marker
 import numpy as np
 
 
@@ -31,14 +32,17 @@ class PersonFollowing(Node):
         self.scanned_points = None
         self.angles = None
         self.needed_angle = 0.0
-        self.average_x_pos = 0.0
-        self.average_y_pos = 0.0
-        self.object_distance = 0.0
+        self.avg_x_pos = 0.0
+        self.avg_y_pos = 0.0
+        self.obj_dist = 0.0
 
         self.timer = self.create_timer(self.timer_period, self.run_loop)
         self.vel_pub = self.create_publisher(Twist, "cmd_vel", 10)
         self.scan_sub = self.create_subscription(
             LaserScan, "scan", self.process_scan, 10
+        )
+        self.visual_pub = self.create_publisher(
+            Marker, "visualization_marker", self.create_marker, 10
         )
 
     def run_loop(self):
@@ -47,6 +51,8 @@ class PersonFollowing(Node):
             self.linear_velocity = 0.0
         else:
             self.linear_velocity = 0.2
+
+        # The angular velocity is proportional to the difference in angle between the Neato and the object
         self.angular_velocity = 0.75 * self.needed_angle
         self.drive(self.linear_velocity, self.angular_velocity)
 
@@ -79,13 +85,17 @@ class PersonFollowing(Node):
         # scanned_points and angles (now smaller) only contain values that are in our range
         self.scanned_points = self.scanned_points[helper]
         self.angles = self.angles[helper]
-        
+
         # Runs the distance and angle calculation if there is a cluster of points in the threshold area (ty charlie)
         if len(self.scanned_points) > 0:
 
             # Converting our polar coordinates to cartesian coordinates
-            self.x_coords = np.multiply(self.scanned_points, np.cos(np.multiply(self.angles, degree_conversion)))
-            self.y_coords = np.multiply(self.scanned_points, np.sin(np.multiply(self.angles, degree_conversion)))
+            self.x_coords = np.multiply(
+                self.scanned_points, np.cos(np.multiply(self.angles, degree_conversion))
+            )
+            self.y_coords = np.multiply(
+                self.scanned_points, np.sin(np.multiply(self.angles, degree_conversion))
+            )
 
             # Finds the center of mass of the object by taking the average position of all the x and y coordinates
             self.avg_x_pos = np.average(self.x_coords)
@@ -100,7 +110,6 @@ class PersonFollowing(Node):
             self.obj_dist = 100
             self.needed_angle = 0.0
 
-
     def drive(self, linear, angular):
         """
         Drive with the inputted linear and angular velocity.
@@ -114,6 +123,30 @@ class PersonFollowing(Node):
         vel.linear.x = linear
         vel.angular.z = angular
         self.vel_pub.publish(vel)
+
+    def create_marker(self):
+        """Creates a marker for RViz2 to visualize where the center of mass of the object detected is."""
+        marker = Marker()
+
+        marker.header.frame_id = "base_link"
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.ns = "my_namespace"
+        marker.id = 0
+        marker.type = Marker.SPHERE
+        marker.action = Marker.ADD
+
+        marker.pose.position.x = self.avg_x_pos
+        marker.pose.position.y = self.avg_y_pos
+        marker.pose.orientation.w = 1.0
+
+        marker.scale.x = 0.1
+        marker.scale.y = 0.1
+        marker.scale.z = 0.1
+
+        marker.color.a = 1.0
+        marker.color.g = 1.0
+
+        self.visualizer_publisher.publish(marker)
 
 
 def main(args=None):

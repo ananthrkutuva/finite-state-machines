@@ -40,7 +40,7 @@ class TeleOp(Node):
     def getKey(self):
         """
         Uses raw input through terminal attributes to take in keyboard input and control the robot.
-        
+
         Returns:
             None
         """

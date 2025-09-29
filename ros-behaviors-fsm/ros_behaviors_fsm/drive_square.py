@@ -16,10 +16,11 @@ from time import sleep
 class DriveSquare(Node):
     """
     A class that implements a node to drive the robot in a square shape.
-    
+
     Publishers Needed:
         - Twist cmd_vel message: Commands wheel velocity in the linear and angular directions
     """
+
     def __init__(self):
         """Initializes the TeleOp Node with no inputs."""
         super().__init__("drive_square")

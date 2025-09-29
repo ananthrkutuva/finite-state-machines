@@ -55,3 +55,8 @@ Our control code can be split up into 6 steps:
 This behavior was much more involved compared to the other two as we needed to take information from the laser scan of the Neato and use that data to inform the Neato's movements. By subscribing to LaserScan messages on the ```/scan``` topic, we can use an array of points organized by degree values around the Neato to find a grouping of points that are within a certain radius of the Neato. We can then convert these points from polar coordinates (radius, theta) to cartesian (X, Y) coordinates to calculate the location of this cluster compared to the Neato. We use Pythagorean Theorem to calculate the distance from the Neato to the cluster as well as the angle between the object and the heading of the Neato. Using this needed_angle value, we can command the Neato to turn, with larger angles commanding a faster angular velocity.\
 
 As the run_loop executes 10 times per second, the needed_angle value is constantly recalculated, stepping up or down the commanded angular velocity until the Neato is directly facing the cluster of points (the object).
+
+## Finite State Machine
+
+### Driving in a Square + Person Following + Bump Sensing
+
