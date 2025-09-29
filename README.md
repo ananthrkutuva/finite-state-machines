@@ -4,7 +4,7 @@ CompRobo FA 2025 - Ananth Kutuva & Cian Linehan
 
 ## Introduction and Overview
 
-This project was mainly for us to get a feel for the various concepts of ROS2 and robot software development as a whole. We were able to implement 4 behaviors with a finite state machine as well. Our initial simple behaviors were teleop control and driving in a square. The advanced behavior we chose to implement was person following. We combined person following, driving in a square, and if bumped, spin in place in our finite state machine.
+This project was mainly for us to get a feel for the various concepts of ROS2 and robot software development as a whole. We were able to implement 4 behaviors with a finite state machine as well. Our initial simple behaviors were teleop control and driving in a square. The advanced behavior we chose to implement was person following. We combined driving in a square and person following, where the neato drives in a square continuously, and if bumped, follow a person.
 
 ## Behaviors
 
